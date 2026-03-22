@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Git/marketplace-alerts -name chromedriver* -type f)",
+      "Bash(.venv/Scripts/pip install:*)"
+    ]
+  }
+}

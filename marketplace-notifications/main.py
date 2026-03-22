@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup as soup
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -39,7 +40,7 @@ def send_email(new_listings):
 # Set up Selenium WebDriver
 chrome_options = Options()
 chrome_options.add_argument("--headless")  # Run in headless mode for faster execution
-service = Service(r'C:\Git\marketplace-alerts\marketplace-notifications\chromedriver-win64\chromedriver.exe')  # Path to your chromedriver executable
+service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 # Set up base URL and search parameters
