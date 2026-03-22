@@ -26,7 +26,7 @@ def send_email(new_listings):
     message["From"] = sender_email
     message["To"] = receiver_email
 
-    html = "<html><body><h2>New Listings Found:</h2><ul>"
+    html = f"<html><body><h2>{len(new_listings)} Listings Found:</h2><ul>"
     for listing in new_listings:
         details = " — ".join(listing['details']) if listing.get('details') else ""
         html += f"<li><a href='{listing['url']}'>{details} - {listing['price']}</a></li>"
@@ -62,7 +62,7 @@ search_params = {
 url = base_url + "&".join([f"{key}={value}" for key, value in search_params.items()])
 
 # Visit the website
-print(f"Searching for: {search_params['query']}")
+print(f"Searching for: {search_params['query']}\n{url}")
 driver.get(url)
 
 # Close the pop-up if it appears
