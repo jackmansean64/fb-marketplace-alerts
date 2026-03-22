@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(find /c/Git/marketplace-alerts -name chromedriver* -type f)",
-      "Bash(.venv/Scripts/pip install:*)"
+      "Bash(.venv/Scripts/pip install:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:scrapfly.io)"
     ]
   }
 }

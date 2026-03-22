@@ -11,6 +11,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import time
+import random
 import re
 from dotenv import load_dotenv
 
@@ -39,11 +40,19 @@ def send_email(new_listings):
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, message.as_string())
 
-# Set up Selenium WebDriver
+# Set up Selenium WebDriver with anti-detection flags
 chrome_options = Options()
-chrome_options.add_argument("--headless")  # Run in headless mode for faster execution
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--window-size=1920,16384")
+chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+chrome_options.add_argument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.7680.80 Safari/537.36")
+chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+chrome_options.add_experimental_option("useAutomationExtension", False)
 service = Service(ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=chrome_options)
+driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+    "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
+})
 
 # Set up base URL and search parameters
 base_url = "https://www.facebook.com/marketplace/victoria/search?"
@@ -65,24 +74,39 @@ url = base_url + "&".join([f"{key}={value}" for key, value in search_params.item
 print(f"Searching for: {search_params['query']}\n{url}")
 driver.get(url)
 
+# Simulate human-like initial wait
+time.sleep(random.uniform(3, 6))
+
 # Close the pop-up if it appears
-time.sleep(5)  # Allow time for the page to load
 try:
     close_button = driver.find_element(By.CSS_SELECTOR, 'div[aria-label="Close"]')
     close_button.click()
+    time.sleep(random.uniform(0.5, 1.5))
 except Exception:
     pass
 
-# Scroll down until all results are loaded
+# Scroll down with human-like behavior
 print("Loading results", end="", flush=True)
-scroll_delay = 2
 last_height = driver.execute_script("return document.body.scrollHeight")
+stale_count = 0
+max_stale = 5
 while True:
+    # Scroll in random increments instead of jumping straight to bottom
+    scroll_amount = random.randint(800, 2000)
+    driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
+    time.sleep(random.uniform(0.3, 0.8))
+
+    # Then scroll to bottom to trigger lazy load
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    time.sleep(scroll_delay)
+    time.sleep(random.uniform(2, 5))
+
     new_height = driver.execute_script("return document.body.scrollHeight")
     if new_height == last_height:
-        break
+        stale_count += 1
+        if stale_count >= max_stale:
+            break
+    else:
+        stale_count = 0
     last_height = new_height
     print(".", end="", flush=True)
 print(" done.")
