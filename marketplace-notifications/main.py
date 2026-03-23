@@ -56,6 +56,8 @@ driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
 
 # Set up base URL and search parameters
 base_url = "https://www.facebook.com/marketplace/victoria/search?"
+
+VEHICLE_CATEGORY_ID = 546583916084032
 search_params = {
     # "minPrice": 100,
     # "maxPrice": 100000,
@@ -66,7 +68,7 @@ search_params = {
     # "maxYear": 2025,
     "query": "Prius V",
     "exact": "false",
-    "category_id": 546583916084032
+    "category_id": VEHICLE_CATEGORY_ID
 }
 url = base_url + "&".join([f"{key}={value}" for key, value in search_params.items()])
 
@@ -85,12 +87,29 @@ try:
 except Exception:
     pass
 
-# Scroll down with human-like behavior
+MAX_LISTINGS = 100
+
+def count_listings_in_dom(driver):
+    """Count unique marketplace listing links currently in the DOM."""
+    return driver.execute_script("""
+        const links = document.querySelectorAll('a[href*="/marketplace/item/"]');
+        const urls = new Set();
+        links.forEach(a => urls.add(a.href.split('?')[0]));
+        return urls.size;
+    """)
+
+# Scroll down with human-like behavior until we have enough listings
 print("Loading results", end="", flush=True)
 last_height = driver.execute_script("return document.body.scrollHeight")
 stale_count = 0
 max_stale = 5
 while True:
+    # Check if we have enough listings already
+    current_count = count_listings_in_dom(driver)
+    if current_count >= MAX_LISTINGS:
+        print(f" {current_count} listings loaded.", end="")
+        break
+
     # Scroll in random increments instead of jumping straight to bottom
     scroll_amount = random.randint(800, 2000)
     driver.execute_script(f"window.scrollBy(0, {scroll_amount});")
@@ -122,6 +141,9 @@ listing_links = market_soup.find_all('a', href=re.compile(r'/marketplace/item/\d
 new_listings = []
 seen_urls = set()
 for link in listing_links:
+    if len(new_listings) >= MAX_LISTINGS:
+        break
+
     href = link.get('href', '')
     full_url = "https://www.facebook.com" + href.split('?')[0]
 
