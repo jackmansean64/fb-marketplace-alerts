@@ -35,12 +35,23 @@ Scrapes Facebook Marketplace listings and sends email notifications with results
 
 ## Usage
 
+**Background mode (default)** — runs immediately, then repeats on the configured `alert_frequency`:
+
 ```bash
 cd marketplace-notifications
 python main.py
 ```
 
+**Single run** — scrape once and exit:
+
+```bash
+python main.py --once
+```
+
+Press `Ctrl+C` to stop background mode.
+
 The script will:
 1. Load your searches from `config.yaml`
 2. Open a headless Chrome browser and scrape Facebook Marketplace for each search
 3. Send a single email with all results to the configured receiver email
+4. In background mode, repeat steps 1–3 on the configured schedule

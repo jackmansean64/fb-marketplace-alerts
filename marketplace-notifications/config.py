@@ -117,10 +117,7 @@ class AppConfig(BaseModel):
     email: EmailConfig
     alert_frequency: AlertFrequency = Field(
         AlertFrequency.DAILY,
-        description=(
-            "How often alerts should be sent. "
-            "Not yet functional — reserved for future scheduling."
-        ),
+        description="How often alerts should be sent.",
     )
     searches: list[SearchConfig] = Field(
         ..., min_length=1, description="One or more search configurations to run"

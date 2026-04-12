@@ -1,11 +1,14 @@
+import argparse
 import os
 import re
 import random
 import smtplib
 import time
+from datetime import datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import schedule
 from bs4 import BeautifulSoup as soup
 from dotenv import load_dotenv
 from selenium import webdriver
@@ -14,7 +17,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
-from config import SearchConfig, load_config
+from config import AlertFrequency, SearchConfig, load_config
 
 
 def send_email(config, all_results: dict[str, list[dict]]):
@@ -174,10 +177,25 @@ def scrape_search(driver, search: SearchConfig) -> list[dict]:
     return listings
 
 
-def main():
+# ---------------------------------------------------------------------------
+# Scheduling
+# ---------------------------------------------------------------------------
+
+FREQUENCY_HOURS = {
+    AlertFrequency.HOURLY: 1,
+    AlertFrequency.DAILY: 24,
+    AlertFrequency.WEEKLY: 168,
+    AlertFrequency.MONTHLY: 720,
+}
+
+
+def run_once():
+    """Run all searches and send the alert email once."""
     config = load_config()
-    print(f"Loaded {len(config.searches)} search(es) from config.")
-    print(f"Alert frequency: {config.alert_frequency.value} (not yet active)")
+    print(f"\n{'=' * 60}")
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Starting scrape run")
+    print(f"Running {len(config.searches)} search(es)...")
+    print(f"{'=' * 60}")
 
     driver = create_driver()
     try:
@@ -189,6 +207,50 @@ def main():
         driver.quit()
 
     send_email(config, all_results)
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Run complete.")
+
+
+def run_scheduled():
+    """Run once immediately, then repeat on the configured schedule."""
+    config = load_config()
+    hours = FREQUENCY_HOURS[config.alert_frequency]
+
+    print(f"Alert frequency: {config.alert_frequency.value} (every {hours}h)")
+    print(f"Running initial scrape now, then repeating every {hours} hour(s).")
+    print("Press Ctrl+C to stop.\n")
+
+    # Run immediately on startup
+    run_once()
+
+    # Schedule future runs
+    schedule.every(hours).hours.do(run_once)
+
+    try:
+        while True:
+            next_run = schedule.next_run()
+            if next_run:
+                print(f"\nNext run at: {next_run.strftime('%Y-%m-%d %H:%M:%S')}")
+            # Sleep in short intervals so Ctrl+C is responsive
+            while not schedule.idle_seconds() or schedule.idle_seconds() > 0:
+                schedule.run_pending()
+                time.sleep(30)
+    except KeyboardInterrupt:
+        print("\nShutting down scheduler.")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Facebook Marketplace Alerts")
+    parser.add_argument(
+        "--once",
+        action="store_true",
+        help="Run a single scrape and exit (no background scheduling)",
+    )
+    args = parser.parse_args()
+
+    if args.once:
+        run_once()
+    else:
+        run_scheduled()
 
 
 if __name__ == "__main__":

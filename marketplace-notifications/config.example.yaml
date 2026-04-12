@@ -18,8 +18,8 @@ email:
   receiver_email: "jackmansean64@gmail.com"
 
 # --- Alert frequency (hourly | daily | weekly | monthly) ---
-# NOTE: This setting is reserved for future use. Alerts are
-#       currently triggered manually via the CLI.
+# Controls how often the app scrapes and sends alert emails
+# when running in background mode (the default).
 alert_frequency: daily
 
 # --- Searches ---
