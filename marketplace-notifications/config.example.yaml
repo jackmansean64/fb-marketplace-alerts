@@ -28,9 +28,20 @@ alert_frequency: daily
 # alert email.
 searches:
   - query: "Prius V"
-    days_since_listed: 30
+
+    # ----------------------------------------------------------
+    # Search filters — applied directly in the Marketplace query
+    # ----------------------------------------------------------
     location: "victoria"
-    allowed_locations:        # only keep listings from these cities (case-insensitive substring match)
+    days_since_listed: 30
+    # min_price: 1000
+    # max_price: 25000
+
+    # ----------------------------------------------------------
+    # Post-processing filters — applied by the app after results
+    # are retrieved from Marketplace
+    # ----------------------------------------------------------
+    allowed_locations:
       - "victoria"
       - "sooke"
       - "saanich"
@@ -57,26 +68,26 @@ searches:
       - "comox valley"
       - "cumberland"
       - "campbell river"
-    max_listings: 100
-
-    # Vehicle-specific filters (only relevant when category is Vehicles)
     vehicle_filters:
       max_mileage: 150000
       # min_year: 2012
       # max_year: 2025
-
-    # Price filters (optional)
-    # min_price: 1000
-    # max_price: 25000
+    max_listings: 100
 
   # --- Example: add a second search ---
   # - query: "Toyota Corolla"
-  #   days_since_listed: 7
+  #
+  #   # Search filters
   #   location: "vancouver"
-  #   sort_by_distance: true
-  #   max_listings: 50
+  #   days_since_listed: 7
+  #   min_price: 5000
+  #   max_price: 20000
+  #
+  #   # Post-processing filters
+  #   allowed_locations:
+  #     - "vancouver"
   #   vehicle_filters:
   #     max_mileage: 120000
   #     min_year: 2015
-  #   min_price: 5000
-  #   max_price: 20000
+  #   max_listings: 50
+  #   scroll_listings: 500
