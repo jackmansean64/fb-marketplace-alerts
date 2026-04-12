@@ -64,6 +64,13 @@ class SearchConfig(BaseModel):
             "Matched case-insensitively. If omitted, all locations are kept."
         ),
     )
+    required_in_title: Optional[list[str]] = Field(
+        None,
+        description=(
+            "Only keep listings whose title contains at least one of these strings. "
+            "Matched case-insensitively. If omitted, all listings are kept."
+        ),
+    )
 
     # Category-specific filters
     vehicle_filters: Optional[VehicleFilters] = Field(

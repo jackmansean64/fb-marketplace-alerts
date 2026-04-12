@@ -36,6 +36,10 @@ searches:
     days_since_listed: 30
     # min_price: 1000
     # max_price: 25000
+    vehicle_filters:
+      max_mileage: 150000
+      # min_year: 2012
+      # max_year: 2025
 
     # ----------------------------------------------------------
     # Post-processing filters — applied by the app after results
@@ -68,10 +72,8 @@ searches:
       - "comox valley"
       - "cumberland"
       - "campbell river"
-    vehicle_filters:
-      max_mileage: 150000
-      # min_year: 2012
-      # max_year: 2025
+    required_in_title:        # only keep listings whose title contains one of these (case-insensitive)
+      - "Prius V"
     max_listings: 100
 
   # --- Example: add a second search ---
@@ -82,12 +84,11 @@ searches:
   #   days_since_listed: 7
   #   min_price: 5000
   #   max_price: 20000
+  #   vehicle_filters:
+  #     max_mileage: 120000
+  #     min_year: 2015
   #
   #   # Post-processing filters
   #   allowed_locations:
   #     - "vancouver"
-  #   vehicle_filters:
-  #     max_mileage: 120000
-  #     min_year: 2015
   #   max_listings: 50
-  #   scroll_listings: 500

@@ -171,6 +171,12 @@ def scrape_search(driver, search: SearchConfig) -> list[dict]:
             if not any(allowed.lower() in loc_lower for allowed in search.allowed_locations):
                 continue
 
+        # Filter by required title keywords (case-insensitive substring match)
+        if search.required_in_title:
+            title = texts[1].lower() if len(texts) > 1 else ""
+            if not any(req.lower() in title for req in search.required_in_title):
+                continue
+
         listings.append({"details": details, "price": price, "location": location, "url": full_url})
 
     print(f"Found {len(listings)} listings for '{search.query}'.")
