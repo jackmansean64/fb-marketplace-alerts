@@ -30,7 +30,33 @@ searches:
   - query: "Prius V"
     days_since_listed: 30
     location: "victoria"
-    sort_by_distance: true    # sort results nearest-first (radius doesn't seem to work)
+    allowed_locations:        # only keep listings from these cities (case-insensitive substring match)
+      - "victoria"
+      - "sooke"
+      - "saanich"
+      - "sidney"
+      - "langford"
+      - "esquimalt"
+      - "oak bay"
+      - "central saanich"
+      - "duncan"
+      - "colwood"
+      - "view royal"
+      - "north cowichan"
+      - "cowichan valley"
+      - "metchosin"
+      - "nanaimo"
+      - "nanaimo district"
+      - "parksville"
+      - "lantzville"
+      - "qualicum beach"
+      - "ladysmith"
+      - "port alberni"
+      - "courtenay"
+      - "comox"
+      - "comox valley"
+      - "cumberland"
+      - "campbell river"
     max_listings: 100
 
     # Vehicle-specific filters (only relevant when category is Vehicles)

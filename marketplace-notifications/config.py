@@ -57,9 +57,12 @@ class SearchConfig(BaseModel):
             "You can also use a numeric location ID."
         ),
     )
-    sort_by_distance: bool = Field(
-        False,
-        description="Sort results by distance (nearest first)",
+    allowed_locations: Optional[list[str]] = Field(
+        None,
+        description=(
+            "Only keep listings from these locations (e.g. ['Victoria, BC']). "
+            "Matched case-insensitively. If omitted, all locations are kept."
+        ),
     )
 
     # Category-specific filters
@@ -86,9 +89,6 @@ class SearchConfig(BaseModel):
             params["maxPrice"] = self.max_price
         if self.days_since_listed is not None:
             params["daysSinceListed"] = self.days_since_listed
-        if self.sort_by_distance:
-            params["sortBy"] = "distance_ascend"
-
         # Vehicle-specific filters
         if self.vehicle_filters:
             vf = self.vehicle_filters

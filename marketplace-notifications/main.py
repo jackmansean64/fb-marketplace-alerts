@@ -34,8 +34,10 @@ def send_email(config, all_results: dict[str, list[dict]]):
         html_parts.append(f"<h2>{search_query} — {len(listings)} listings</h2><ul>")
         for listing in listings:
             details = " — ".join(listing["details"]) if listing.get("details") else ""
+            location = listing.get("location", "")
+            loc_str = f" ({location})" if location else ""
             html_parts.append(
-                f"<li><a href='{listing['url']}'>{details} - {listing['price']}</a></li>"
+                f"<li><a href='{listing['url']}'>{details} - {listing['price']}{loc_str}</a></li>"
             )
         html_parts.append("</ul>")
     html_parts.append("</body></html>")
@@ -158,8 +160,15 @@ def scrape_search(driver, search: SearchConfig) -> list[dict]:
 
         price = texts[0] if texts else "N/A"
         details = [t for t in texts if not t.startswith("CA$")]
+        location = texts[2] if len(texts) > 2 else ""
 
-        listings.append({"details": details, "price": price, "url": full_url})
+        # Filter by allowed locations (case-insensitive substring match)
+        if search.allowed_locations:
+            loc_lower = location.lower()
+            if not any(allowed.lower() in loc_lower for allowed in search.allowed_locations):
+                continue
+
+        listings.append({"details": details, "price": price, "location": location, "url": full_url})
 
     print(f"Found {len(listings)} listings for '{search.query}'.")
     return listings
