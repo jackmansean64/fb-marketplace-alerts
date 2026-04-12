@@ -233,13 +233,11 @@ def run_scheduled():
 
     try:
         while True:
+            schedule.run_pending()
             next_run = schedule.next_run()
             if next_run:
-                print(f"\nNext run at: {next_run.strftime('%Y-%m-%d %H:%M:%S')}")
-            # Sleep in short intervals so Ctrl+C is responsive
-            while not schedule.idle_seconds() or schedule.idle_seconds() > 0:
-                schedule.run_pending()
-                time.sleep(30)
+                print(f"\rNext run at: {next_run.strftime('%Y-%m-%d %H:%M:%S')}", end="", flush=True)
+            time.sleep(5)
     except KeyboardInterrupt:
         print("\nShutting down scheduler.")
 
