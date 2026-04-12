@@ -1,0 +1,56 @@
+# ============================================================
+# Facebook Marketplace Alerts — Configuration
+# ============================================================
+# Copy this file to config.yaml and edit it to match your needs.
+#
+# Location slugs are the city/region names that appear in the
+# Facebook Marketplace URL, e.g.:
+#   https://www.facebook.com/marketplace/victoria/search?...
+#                                       ^^^^^^^^
+# Common examples: victoria, vancouver, toronto, calgary,
+#                  edmonton, ottawa, montreal
+# You can also use a numeric Facebook location ID.
+# ============================================================
+
+# --- Email settings ---
+email:
+  sender_email: "jackmansean64@gmail.com"
+  receiver_email: "jackmansean64@gmail.com"
+
+# --- Alert frequency (hourly | daily | weekly | monthly) ---
+# NOTE: This setting is reserved for future use. Alerts are
+#       currently triggered manually via the CLI.
+alert_frequency: daily
+
+# --- Searches ---
+# You can define as many searches as you like. Each one will
+# be run independently and the results combined into a single
+# alert email.
+searches:
+  - query: "Prius V"
+    days_since_listed: 30
+    location: "victoria"
+    sort_by_distance: true    # sort results nearest-first (radius doesn't seem to work)
+    max_listings: 100
+
+    # Vehicle-specific filters (only relevant when category is Vehicles)
+    vehicle_filters:
+      max_mileage: 150000
+      # min_year: 2012
+      # max_year: 2025
+
+    # Price filters (optional)
+    # min_price: 1000
+    # max_price: 25000
+
+  # --- Example: add a second search ---
+  # - query: "Toyota Corolla"
+  #   days_since_listed: 7
+  #   location: "vancouver"
+  #   sort_by_distance: true
+  #   max_listings: 50
+  #   vehicle_filters:
+  #     max_mileage: 120000
+  #     min_year: 2015
+  #   min_price: 5000
+  #   max_price: 20000

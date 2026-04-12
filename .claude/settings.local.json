@@ -7,7 +7,13 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:gist.github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:scrapfly.io)"
+      "WebFetch(domain:scrapfly.io)",
+      "Bash(gh issue:*)",
+      "Bash(gh --version)",
+      "Bash(gh auth:*)",
+      "Bash(mkdir -p ~/.claude/skills/develop)",
+      "Bash(cp \"C:/Git/marketplace-alerts/.claude/skills/develop/SKILL.md\" ~/.claude/skills/develop/SKILL.md)",
+      "Read(//c/Users/Sean Jackman/.claude/skills/develop/**)"
     ]
   }
 }

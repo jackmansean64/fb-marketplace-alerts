@@ -4,6 +4,9 @@
 # Environment variables
 .env
 
+# User config (contains personal settings — use config.example.yaml as template)
+config.yaml
+
 # ChromeDriver binaries
 chromedriver-win64/
 
