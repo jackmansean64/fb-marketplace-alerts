@@ -34,15 +34,26 @@ def send_email(config, all_results: dict[str, list[dict]]):
     total = 0
     for search_query, listings in all_results.items():
         total += len(listings)
-        html_parts.append(f"<h2>{search_query} — {len(listings)} listings</h2><ul>")
+        html_parts.append(f"<h2>{search_query} — {len(listings)} listings</h2>")
         for listing in listings:
             details = " — ".join(listing["details"]) if listing.get("details") else ""
             location = listing.get("location", "")
             loc_str = f" ({location})" if location else ""
-            html_parts.append(
-                f"<li><a href='{listing['url']}'>{details} - {listing['price']}{loc_str}</a></li>"
+            title = listing["details"][0] if listing.get("details") else ""
+            images = listing.get("images", [])
+            imgs_html = "".join(
+                f"<img src='{src}' alt='{title}' "
+                f"style='width:120px;height:120px;object-fit:cover;border-radius:8px;margin-right:4px;'>"
+                for src in images
             )
-        html_parts.append("</ul>")
+            html_parts.append(
+                f"<div style='margin-bottom:16px;'>"
+                f"<a href='{listing['url']}' style='text-decoration:none;color:inherit;'>"
+                f"<div style='font-size:16px;'><strong>{title}</strong></div>"
+                f"<div style='margin-top:6px;'>{listing['price']}{loc_str}</div>"
+                f"<div style='margin-top:6px;'>{imgs_html}</div>"
+                f"</a></div>"
+            )
     html_parts.append("</body></html>")
 
     if total == 0:
@@ -158,6 +169,10 @@ def scrape_search(driver, search: SearchConfig) -> list[dict]:
             continue
         seen_urls.add(full_url)
 
+        # Extract all image URLs
+        imgs = link.find_all("img")
+        image_urls = [img.get("src", "") for img in imgs if img.get("src")]
+
         spans = link.find_all("span")
         texts = list(dict.fromkeys(s.text.strip() for s in spans if s.text.strip()))
 
@@ -177,7 +192,13 @@ def scrape_search(driver, search: SearchConfig) -> list[dict]:
             if not any(req.lower() in title for req in search.required_in_title):
                 continue
 
-        listings.append({"details": details, "price": price, "location": location, "url": full_url})
+        listings.append({
+            "details": details,
+            "price": price,
+            "location": location,
+            "images": image_urls,
+            "url": full_url,
+        })
 
     print(f"Found {len(listings)} listings for '{search.query}'.")
     return listings
