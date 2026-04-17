@@ -112,10 +112,13 @@ class SearchConfig(BaseModel):
 
 
 class EmailConfig(BaseModel):
-    """Email notification settings."""
+    """Email notification settings.
 
-    sender_email: str = Field(..., description="Gmail address to send from")
-    receiver_email: str = Field(..., description="Email address to receive alerts")
+    The sending address and Mailgun credentials are configured via environment
+    variables (see README). Only the recipient is specified here.
+    """
+
+    recipient_email: str = Field(..., description="Email address to receive alerts")
 
 
 class AppConfig(BaseModel):

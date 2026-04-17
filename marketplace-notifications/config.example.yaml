@@ -13,9 +13,10 @@
 # ============================================================
 
 # --- Email settings ---
+# The sending address and Mailgun credentials are configured via environment
+# variables in a .env file (see README). Only the recipient is set here.
 email:
-  sender_email: "jackmansean64@gmail.com"
-  receiver_email: "jackmansean64@gmail.com"
+  recipient_email: "you@example.com"
 
 # --- Alert frequency (hourly | daily | weekly | monthly) ---
 # Controls how often the app scrapes and sends alert emails

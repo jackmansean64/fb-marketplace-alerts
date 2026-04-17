@@ -1,16 +1,11 @@
 import argparse
-import os
 import re
 import random
-import smtplib
 import time
 from datetime import datetime
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 import schedule
 from bs4 import BeautifulSoup as soup
-from dotenv import load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -18,57 +13,7 @@ from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 
 from config import AlertFrequency, SearchConfig, load_config
-
-
-def send_email(config, all_results: dict[str, list[dict]]):
-    """Send a single HTML email containing results for all searches."""
-    load_dotenv()
-    password = os.getenv("GOOGLE_APP_PASSWORD")
-
-    message = MIMEMultipart("alternative")
-    message["Subject"] = "New Facebook Marketplace Listings"
-    message["From"] = config.email.sender_email
-    message["To"] = config.email.receiver_email
-
-    html_parts = ["<html><body>"]
-    total = 0
-    for search_query, listings in all_results.items():
-        total += len(listings)
-        html_parts.append(f"<h2>{search_query} — {len(listings)} listings</h2>")
-        for listing in listings:
-            details = " — ".join(listing["details"]) if listing.get("details") else ""
-            location = listing.get("location", "")
-            loc_str = f" ({location})" if location else ""
-            title = listing["details"][0] if listing.get("details") else ""
-            images = listing.get("images", [])
-            imgs_html = "".join(
-                f"<img src='{src}' alt='{title}' "
-                f"style='width:120px;height:120px;object-fit:cover;border-radius:8px;margin-right:4px;'>"
-                for src in images
-            )
-            html_parts.append(
-                f"<div style='margin-bottom:16px;'>"
-                f"<a href='{listing['url']}' style='text-decoration:none;color:inherit;'>"
-                f"<div style='font-size:16px;'><strong>{title}</strong></div>"
-                f"<div style='margin-top:6px;'>{listing['price']}{loc_str}</div>"
-                f"<div style='margin-top:6px;'>{imgs_html}</div>"
-                f"</a></div>"
-            )
-    html_parts.append("</body></html>")
-
-    if total == 0:
-        print("No listings found across all searches. Skipping email.")
-        return
-
-    part = MIMEText("".join(html_parts), "html")
-    message.attach(part)
-
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(config.email.sender_email, password)
-        server.sendmail(
-            config.email.sender_email, config.email.receiver_email, message.as_string()
-        )
-    print(f"Email sent with {total} total listings.")
+from email_service import send_marketplace_alert_email
 
 
 def create_driver() -> webdriver.Chrome:
@@ -233,7 +178,7 @@ def run_once():
     finally:
         driver.quit()
 
-    send_email(config, all_results)
+    send_marketplace_alert_email(config.email.recipient_email, all_results)
     print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Run complete.")
 
 

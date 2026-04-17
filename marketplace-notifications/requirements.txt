@@ -4,4 +4,5 @@ beautifulsoup4
 python-dotenv
 pydantic
 pyyaml
+requests
 schedule

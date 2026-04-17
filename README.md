@@ -6,7 +6,7 @@ Scrapes Facebook Marketplace listings and sends email notifications with results
 
 - Python 3.10+
 - Google Chrome installed
-- A Gmail account with a [Google App Password](https://support.google.com/accounts/answer/185833) for sending emails
+- A [Mailgun](https://www.mailgun.com/) account with a verified sending domain
 
 ## Setup
 
@@ -19,11 +19,22 @@ Scrapes Facebook Marketplace listings and sends email notifications with results
    pip install -r requirements.txt
    ```
 
-2. **Create a `.env` file** in the `marketplace-notifications/` directory:
+2. **Set up Mailgun and create a `.env` file.**
 
+   Sign up at [mailgun.com](https://www.mailgun.com/) and verify a sending
+   domain. Then copy `.env.example` to `.env` in the
+   `marketplace-notifications/` directory and fill in your Mailgun values:
+
+   ```bash
+   cp .env.example .env
    ```
-   GOOGLE_APP_PASSWORD = "your-google-app-password"
-   ```
+
+   The variables you need to provide are:
+
+   - `MAILGUN_API_KEY` — your Mailgun private API key.
+   - `MAILGUN_DOMAIN` — the sending domain you verified in Mailgun.
+   - `MAILGUN_FROM_ADDRESS` — the address alerts will be sent from (must be
+     on your Mailgun domain).
 
 3. **Create your config file** by copying the example:
 
@@ -31,7 +42,9 @@ Scrapes Facebook Marketplace listings and sends email notifications with results
    cp config.example.yaml config.yaml
    ```
 
-   Edit `config.yaml` to set your email addresses, search queries, location, price range, and any other filters. See `config.example.yaml` for all available options.
+   Edit `config.yaml` to set your `recipient_email` (the address that will
+   receive alerts), search queries, location, price range, and any other
+   filters. See `config.example.yaml` for all available options.
 
 ## Usage
 
